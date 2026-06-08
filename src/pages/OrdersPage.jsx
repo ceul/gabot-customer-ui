@@ -296,7 +296,7 @@ function OrderModal({ orderId, onClose, onStatusChange }) {
       onClick={onClose}
     >
       <div
-        className="relative bg-surface w-full sm:max-w-lg sm:mx-4 rounded-t-3xl sm:rounded-3xl shadow-xl border border-outline-variant/20 overflow-hidden flex flex-col"
+        className="relative bg-surface w-full sm:max-w-[32rem] sm:mx-4 rounded-t-3xl sm:rounded-3xl shadow-xl border border-outline-variant/20 overflow-hidden flex flex-col"
         style={{ maxHeight: '92vh', animation: 'slideUp 260ms cubic-bezier(0.34,1.56,0.64,1) both' }}
         onClick={e => e.stopPropagation()}
       >

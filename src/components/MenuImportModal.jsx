@@ -125,7 +125,7 @@ export default function MenuImportModal({ onClose, onImported, existingCategoryC
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/20 backdrop-blur-sm p-4">
-      <div className="bg-surface rounded-2xl border border-outline-variant/20 shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div className="bg-surface rounded-2xl border border-outline-variant/20 shadow-xl w-full max-w-[32rem] max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/20">
           <h2 className="font-space text-base font-semibold text-on-surface">Importar menú desde archivo</h2>
           <button onClick={onClose} className="text-secondary hover:text-on-surface">
