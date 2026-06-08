@@ -110,7 +110,7 @@ export default function MenuImportModal({ onClose, onImported, existingCategoryC
             name: item.name,
             price: item.price,
             description: item.description || '',
-            is_available: true,
+            is_available: item.price != null && Number(item.price) > 0,
           })
         }
       }
