@@ -59,11 +59,11 @@ export function Select({ options, className = '', ...props }) {
   )
 }
 
-export function Toggle({ checked, onChange, label }) {
+export function Toggle({ checked, onChange, label, disabled = false }) {
   return (
     <label
-      className="flex items-center gap-3 cursor-pointer select-none"
-      onClick={() => onChange(!checked)}
+      className={`flex items-center gap-3 select-none ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      onClick={disabled ? undefined : () => onChange(!checked)}
     >
       <div
         className={`relative w-10 h-5 rounded-full transition-colors ${checked ? 'bg-primary' : 'bg-outline-variant'}`}
