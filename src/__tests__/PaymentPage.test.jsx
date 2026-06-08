@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import userEvent from '@testing-library/user-event'
 import PaymentPage from '../pages/PaymentPage'
 
 // Actual API shape: paymentMethods.get(), .update(id, data), .create(data), .delete(id)
@@ -60,6 +61,36 @@ describe('PaymentPage', () => {
     await waitFor(() => {
       expect(screen.getByText(/agregar cuenta bancaria/i)).toBeInTheDocument()
     })
+  })
+
+  it('renders all three simple methods even when API returns empty array', async () => {
+    const { paymentMethods } = await import('../api')
+    paymentMethods.get.mockResolvedValueOnce([])
+    render(<MemoryRouter><PaymentPage /></MemoryRouter>)
+    await waitFor(() => {
+      expect(screen.getByText(/efectivo/i)).toBeInTheDocument()
+      expect(screen.getByText(/tarjeta de crédito/i)).toBeInTheDocument()
+      expect(screen.getByText(/tarjeta débito/i)).toBeInTheDocument()
+    })
+  })
+
+  it('calls create when toggling a method with no existing record', async () => {
+    const user = userEvent.setup()
+    const { paymentMethods } = await import('../api')
+    paymentMethods.get.mockResolvedValueOnce([])
+    paymentMethods.create.mockResolvedValueOnce({ id: 99, method_type: 'cash', is_enabled: true })
+
+    render(<MemoryRouter><PaymentPage /></MemoryRouter>)
+    await waitFor(() => expect(screen.getByText(/efectivo/i)).toBeInTheDocument())
+
+    // Scope to the cash card by finding the Efectivo text's parent container
+    const cashCard = screen.getByText(/efectivo/i).parentElement
+    const toggleLabel = within(cashCard).getByText(/deshabilitado/i).closest('label')
+    await user.click(toggleLabel)
+
+    await waitFor(() =>
+      expect(paymentMethods.create).toHaveBeenCalledWith({ method_type: 'cash', is_enabled: true })
+    )
   })
 
   it('renders bank account card when bank account exists', async () => {

@@ -61,9 +61,11 @@ export function Select({ options, className = '', ...props }) {
 
 export function Toggle({ checked, onChange, label }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer select-none">
+    <label
+      className="flex items-center gap-3 cursor-pointer select-none"
+      onClick={() => onChange(!checked)}
+    >
       <div
-        onClick={() => onChange(!checked)}
         className={`relative w-10 h-5 rounded-full transition-colors ${checked ? 'bg-primary' : 'bg-outline-variant'}`}
       >
         <span

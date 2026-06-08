@@ -10,12 +10,14 @@ const SIMPLE_LABELS = {
   debit_card:  'Tarjeta débito',
 }
 
+const SIMPLE_TYPES = ['cash', 'credit_card', 'debit_card']
+
 function SimpleMethodCard({ method, onToggle }) {
   const [saving, setSaving] = useState(false)
 
   const handleToggle = async (val) => {
     setSaving(true)
-    await onToggle(method.id, val)
+    await onToggle(method, val)
     setSaving(false)
   }
 
@@ -210,9 +212,14 @@ export default function PaymentPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleToggle = async (id, is_enabled) => {
-    const updated = await api.update(id, { is_enabled })
-    setMethods(prev => prev.map(m => m.id === id ? updated : m))
+  const handleToggle = async (method, is_enabled) => {
+    if (method.id === null) {
+      const created = await api.create({ method_type: method.method_type, is_enabled })
+      setMethods(prev => [...prev, created])
+    } else {
+      const updated = await api.update(method.id, { is_enabled })
+      setMethods(prev => prev.map(m => m.id === method.id ? updated : m))
+    }
   }
 
   const handleSaveBank = async (id, data) => {
@@ -234,7 +241,12 @@ export default function PaymentPage() {
 
   if (loading) return <Spinner />
 
-  const simpleMethods = methods.filter(m => ['cash', 'credit_card', 'debit_card'].includes(m.method_type))
+  const apiMap = Object.fromEntries(
+    methods
+      .filter(m => SIMPLE_TYPES.includes(m.method_type))
+      .map(m => [m.method_type, m])
+  )
+  const simpleMethods = SIMPLE_TYPES.map(type => apiMap[type] ?? { id: null, method_type: type, is_enabled: false })
   const bankAccounts  = methods.filter(m => m.method_type === 'money_transfer')
 
   return (
@@ -249,7 +261,7 @@ export default function PaymentPage() {
       <h2 className="text-sm font-semibold text-secondary uppercase tracking-wider mb-3">Métodos simples</h2>
       <div className="space-y-3 mb-8">
         {simpleMethods.map(m => (
-          <SimpleMethodCard key={m.id} method={m} onToggle={handleToggle} />
+          <SimpleMethodCard key={m.method_type} method={m} onToggle={handleToggle} />
         ))}
       </div>
 
