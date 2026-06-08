@@ -64,7 +64,7 @@ function SpecialCard({ special, onSave, onDelete }) {
 }
 
 function NewSpecialForm({ onAdd, onCancel }) {
-  const { register, handleSubmit, control, formState: { isSubmitting } } = useForm({ defaultValues: EMPTY })
+  const { register, handleSubmit, formState: { isSubmitting } } = useForm({ defaultValues: EMPTY })
 
   const onSubmit = async (data) => {
     await onAdd({ ...data, day_of_week: Number(data.day_of_week) })

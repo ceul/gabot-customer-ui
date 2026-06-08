@@ -399,7 +399,7 @@ function OrderModal({ orderId, onClose, onStatusChange }) {
         )}
         {!loading && order && (
           <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-container-low flex flex-wrap gap-2 shrink-0">
-            {STATUSES.filter(s => s !== order.status).map((s, i) => {
+            {STATUSES.filter(s => s !== order.status).map((s) => {
               const toCfg = STATUS_CONFIG[s]
               const isPrev = STATUSES.indexOf(s) < currentIdx
               return (
