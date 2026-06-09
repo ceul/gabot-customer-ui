@@ -11,7 +11,7 @@ export default function MetaCredentialsCard() {
   const [saved, setSaved] = useState(false)
   const [hasToken, setHasToken] = useState(false)
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm({ defaultValues: DEFAULTS })
+  const { register, handleSubmit, reset, watch, formState: { isSubmitting } } = useForm({ defaultValues: DEFAULTS })
 
   useEffect(() => {
     api.get()
@@ -42,7 +42,9 @@ export default function MetaCredentialsCard() {
     }
   }
 
-  const isComplete = hasToken && !loading
+  const phoneNumberId = watch('phone_number_id')
+  const wabaId = watch('waba_id')
+  const isComplete = hasToken && !!phoneNumberId && !!wabaId
 
   if (loading) return null
 

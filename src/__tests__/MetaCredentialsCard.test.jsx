@@ -98,4 +98,12 @@ describe('MetaCredentialsCard', () => {
       )
     })
   })
+
+  it('shows warning badge when has_token is true but phone_number_id is empty', async () => {
+    api.get.mockResolvedValue({ phone_number_id: '', waba_id: '222', has_token: true })
+    renderCard()
+    await waitFor(() => {
+      expect(screen.getByText(/credenciales incompletas/i)).toBeInTheDocument()
+    })
+  })
 })
