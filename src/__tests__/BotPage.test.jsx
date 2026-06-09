@@ -15,6 +15,10 @@ vi.mock('../api', () => ({
     }),
     update: vi.fn().mockResolvedValue({}),
   },
+  metaCredentials: {
+    get: vi.fn().mockResolvedValue({ phone_number_id: '111', waba_id: '222', has_token: true }),
+    update: vi.fn().mockResolvedValue({}),
+  },
 }))
 
 describe('BotPage', () => {
@@ -40,6 +44,13 @@ describe('BotPage', () => {
       expect(screen.getByText('Identidad')).toBeInTheDocument()
       expect(screen.getByText('Personalidad')).toBeInTheDocument()
       expect(screen.getByText('Notificaciones')).toBeInTheDocument()
+    })
+  })
+
+  it('renders the Meta credentials section', async () => {
+    render(<MemoryRouter><BotPage /></MemoryRouter>)
+    await waitFor(() => {
+      expect(screen.getByText(/credenciales de whatsapp/i)).toBeInTheDocument()
     })
   })
 

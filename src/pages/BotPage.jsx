@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { bot as api } from '../api'
 import { PageHeader, Card, Field, Input, Textarea, Select, Toggle, SaveBar, Spinner, ErrorMsg } from '../components/ui'
+import MetaCredentialsCard from '../components/MetaCredentialsCard'
 
 const TONES = [
   { value: 'friendly', label: 'Amigable' },
@@ -101,6 +102,8 @@ export default function BotPage() {
             label="Notificar al cliente por WhatsApp al cambiar el estado del pedido"
           />
         </Card>
+
+        <MetaCredentialsCard />
       </div>
 
       <SaveBar saving={isSubmitting} saved={saved} onSave={handleSubmit(onSubmit)} />
