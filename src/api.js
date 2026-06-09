@@ -93,3 +93,8 @@ export const paymentMethods = {
   create: (data) => api.post('/payment-methods', data).then(r => r.data),
   delete: (id) => api.delete(`/payment-methods/${id}`).then(r => r.data),
 }
+
+export const metaCredentials = {
+  get: () => api.get('/restaurant/meta-credentials').then(r => r.data),
+  update: (data) => api.put('/restaurant/meta-credentials', data).then(r => r.data),
+}
