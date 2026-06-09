@@ -106,4 +106,12 @@ describe('MetaCredentialsCard', () => {
       expect(screen.getByText(/credenciales incompletas/i)).toBeInTheDocument()
     })
   })
+
+  it('shows error message when api.get fails', async () => {
+    api.get.mockRejectedValue(new Error('network'))
+    renderCard()
+    await waitFor(() => {
+      expect(screen.getByText(/no se pudo cargar/i)).toBeInTheDocument()
+    })
+  })
 })

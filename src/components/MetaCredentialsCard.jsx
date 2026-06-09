@@ -37,6 +37,7 @@ export default function MetaCredentialsCard() {
       reset({ phone_number_id: updated.phone_number_id || '', waba_id: updated.waba_id || '', meta_access_token: '' })
       setHasToken(!!updated.has_token)
       setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
     } catch {
       setError('Error al guardar las credenciales.')
     }
