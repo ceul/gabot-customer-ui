@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import BotPage from '../pages/BotPage'
 
@@ -14,6 +14,7 @@ vi.mock('../api', () => ({
       notify_on_status_change: true,
     }),
     update: vi.fn().mockResolvedValue({}),
+    test: vi.fn().mockResolvedValue({ response: 'Hola soy Sofia' }),
   },
   metaCredentials: {
     get: vi.fn().mockResolvedValue({ phone_number_id: '111', waba_id: '222', has_token: true }),
@@ -51,6 +52,22 @@ describe('BotPage', () => {
     render(<MemoryRouter><BotPage /></MemoryRouter>)
     await waitFor(() => {
       expect(screen.getByText(/credenciales de whatsapp/i)).toBeInTheDocument()
+    })
+  })
+
+  it('renders Probar Bot button', async () => {
+    render(<MemoryRouter><BotPage /></MemoryRouter>)
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /probar bot/i })).toBeInTheDocument()
+    })
+  })
+
+  it('opens TestDialog when Probar Bot clicked', async () => {
+    render(<MemoryRouter><BotPage /></MemoryRouter>)
+    await waitFor(() => screen.getByRole('button', { name: /probar bot/i }))
+    fireEvent.click(screen.getByRole('button', { name: /probar bot/i }))
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
   })
 

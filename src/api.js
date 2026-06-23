@@ -46,6 +46,7 @@ export const restaurant = {
 export const bot = {
   get: () => api.get('/bot').then(r => r.data),
   update: (data) => api.put('/bot', data).then(r => r.data),
+  test: (data) => api.post('/bot/test', data).then(r => r.data),
 }
 
 export const hours = {

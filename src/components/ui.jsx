@@ -91,9 +91,10 @@ export function Button({ variant = 'primary', className = '', children, ...props
   )
 }
 
-export function SaveBar({ saving, saved, onSave }) {
+export function SaveBar({ saving, saved, onSave, secondaryAction }) {
   return (
     <div className="flex items-center justify-end gap-3 mt-6">
+      {secondaryAction && <div className="mr-auto">{secondaryAction}</div>}
       {saved && <span className="text-sm text-primary font-medium">¡Guardado!</span>}
       <Button onClick={onSave} disabled={saving}>
         {saving ? 'Guardando…' : 'Guardar cambios'}

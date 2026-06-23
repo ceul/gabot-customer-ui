@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { bot as api } from '../api'
 import { PageHeader, Card, Field, Input, Textarea, Select, Toggle, SaveBar, Spinner, ErrorMsg } from '../components/ui'
 import MetaCredentialsCard from '../components/MetaCredentialsCard'
+import TestDialog from '../components/TestDialog'
 
 const TONES = [
   { value: 'friendly', label: 'Amigable' },
@@ -25,6 +26,7 @@ export default function BotPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [testOpen, setTestOpen] = useState(false)
 
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm({ defaultValues: DEFAULTS })
   const [notifyEnabled, setNotifyEnabled] = useState(false)
@@ -106,7 +108,26 @@ export default function BotPage() {
         <MetaCredentialsCard />
       </div>
 
-      <SaveBar saving={isSubmitting} saved={saved} onSave={handleSubmit(onSubmit)} />
+      <SaveBar
+        saving={isSubmitting}
+        saved={saved}
+        onSave={handleSubmit(onSubmit)}
+        secondaryAction={
+          <button
+            type="button"
+            onClick={() => setTestOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-full hover:bg-blue-50 transition-colors"
+          >
+            Probar Bot
+          </button>
+        }
+      />
+
+      <TestDialog
+        open={testOpen}
+        onClose={() => setTestOpen(false)}
+        onSend={(message, history) => api.test({ message, history }).then(r => r.response)}
+      />
     </div>
   )
 }
