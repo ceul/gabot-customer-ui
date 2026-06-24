@@ -10,6 +10,7 @@ import ConversationsPage from './pages/ConversationsPage'
 import OrdersPage from './pages/OrdersPage'
 import PaymentPage from './pages/PaymentPage'
 import LoginPage from './pages/LoginPage'
+import WaiterOrderPage from './pages/WaiterOrderPage'
 import { Spinner } from './components/ui'
 
 function ProtectedRoute({ children }) {
@@ -45,6 +46,7 @@ export default function App() {
                     <Route path="/payment" element={<PaymentPage />} />
                     <Route path="/conversations" element={<ConversationsPage />} />
                     <Route path="/orders" element={<OrdersPage />} />
+                    <Route path="/waiter" element={<WaiterOrderPage />} />
                   </Routes>
                 </Layout>
               </ProtectedRoute>

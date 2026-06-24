@@ -12,7 +12,7 @@ vi.mock('../api', () => ({
       {
         id: 1,
         name: 'Entradas',
-        items: [{ id: 10, name: 'Empanadas', price: 5000, description: '', is_available: true }],
+        items: [{ id: 10, name: 'Empanadas', price: 5000, description: '', available: true }],
       },
     ]),
     createCategory: vi.fn().mockResolvedValue({}),

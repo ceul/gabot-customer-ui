@@ -7,7 +7,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Upload } from 'lucide-react'
 
 function ItemForm({ item, onSave, onDelete, onCancel }) {
   const { register, handleSubmit, control, formState: { isSubmitting } } = useForm({
-    defaultValues: item ?? { name: '', description: '', price: '', is_available: true },
+    defaultValues: item ?? { name: '', description: '', price: '', available: true },
   })
 
   return (
@@ -27,7 +27,7 @@ function ItemForm({ item, onSave, onDelete, onCancel }) {
       </Field>
       <div className="flex items-center justify-between">
         <Controller
-          name="is_available"
+          name="available"
           control={control}
           render={({ field }) => (
             <Toggle checked={field.value} onChange={field.onChange} label="Disponible" />
@@ -108,7 +108,7 @@ function CategorySection({ cat, onUpdate, onDelete, onAddItem, onUpdateItem, onD
                 onClick={() => setEditItemId(item.id)}
               >
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium truncate ${!item.is_available ? 'line-through text-secondary' : 'text-on-surface'}`}>
+                  <p className={`text-sm font-medium truncate ${!item.available ? 'line-through text-secondary' : 'text-on-surface'}`}>
                     {item.name}
                   </p>
                   {item.description && (
@@ -116,7 +116,7 @@ function CategorySection({ cat, onUpdate, onDelete, onAddItem, onUpdateItem, onD
                   )}
                 </div>
                 <span className="text-sm text-primary font-medium shrink-0">${Number(item.price).toLocaleString('es-CO')}</span>
-                {!item.is_available && (
+                {!item.available && (
                   <span className="bg-error-container text-on-error-container rounded-full px-2 py-0.5 text-xs">No disponible</span>
                 )}
               </div>

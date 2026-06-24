@@ -56,6 +56,7 @@ export const hours = {
 
 export const menu = {
   get: () => api.get('/menu').then(r => r.data),
+  categories: () => api.get('/menu').then(r => r.data),
   createCategory: (data) => api.post('/menu/categories', data).then(r => r.data),
   updateCategory: (id, data) => api.put(`/menu/categories/${id}`, data).then(r => r.data),
   deleteCategory: (id) => api.delete(`/menu/categories/${id}`).then(r => r.data),
@@ -86,6 +87,21 @@ export const orders = {
   list: (params) => api.get('/orders', { params }).then(r => r.data),
   get: (id) => api.get(`/orders/${id}`).then(r => r.data),
   updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }).then(r => r.data),
+  create: (data) => api.post('/orders', data).then(r => r.data),
+}
+
+export const recommend = {
+  suggest: (restaurantId, data, signal) =>
+    api.post(`/v1/restaurants/${restaurantId}/recommend`, data, { signal }).then(r => r.data),
+  accept: (restaurantId, logId) =>
+    api.patch(`/v1/restaurants/${restaurantId}/recommend-logs/${logId}/accept`).then(r => r.data),
+}
+
+export const upsellRules = {
+  list: (restaurantId) => api.get(`/v1/restaurants/${restaurantId}/upsell-rules`).then(r => r.data),
+  create: (restaurantId, data) => api.post(`/v1/restaurants/${restaurantId}/upsell-rules`, data).then(r => r.data),
+  update: (restaurantId, ruleId, data) => api.put(`/v1/restaurants/${restaurantId}/upsell-rules/${ruleId}`, data).then(r => r.data),
+  delete: (restaurantId, ruleId) => api.delete(`/v1/restaurants/${restaurantId}/upsell-rules/${ruleId}`).then(r => r.data),
 }
 
 export const paymentMethods = {

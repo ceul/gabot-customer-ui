@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { Store, Bot, Clock, UtensilsCrossed, Star, MessageSquare, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, LogOut, CreditCard } from 'lucide-react'
+import { Store, Bot, Clock, UtensilsCrossed, Star, MessageSquare, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, LogOut, CreditCard, ClipboardList } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const mainNav = [
   { to: '/orders',        label: 'Pedidos',         icon: ShoppingBag },
+  { to: '/waiter',        label: 'Tomar Pedido',    icon: ClipboardList },
   { to: '/conversations', label: 'Conversaciones',  icon: MessageSquare },
 ]
 
@@ -41,7 +42,7 @@ export default function Layout({ children }) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { user, restaurant, logout } = useAuth()
-  const fullHeight = pathname.startsWith('/conversations') || pathname.startsWith('/orders')
+  const fullHeight = pathname.startsWith('/conversations') || pathname.startsWith('/orders') || pathname.startsWith('/waiter')
   const [configOpen, setConfigOpen] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
