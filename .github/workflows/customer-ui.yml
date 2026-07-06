@@ -62,8 +62,9 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          envs: DEPLOY_TAG,BRANCH
+          envs: DEPLOY_TAG,BRANCH,GH_TOKEN,GH_ACTOR
           script: |
+            echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_ACTOR" --password-stdin
             cd /opt/gabot
             docker pull "$DEPLOY_TAG"
             if [ "$BRANCH" = "master" ]; then
@@ -74,3 +75,5 @@ jobs:
         env:
           DEPLOY_TAG: ${{ needs.build-and-push.outputs.tag }}
           BRANCH: ${{ github.ref_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
