@@ -97,6 +97,12 @@ export const recommend = {
     api.patch(`/v1/restaurants/${restaurantId}/recommend-logs/${logId}/accept`).then(r => r.data),
 }
 
+export const pendingQuestions = {
+  list: (restaurantId) => api.get(`/v1/restaurants/${restaurantId}/pending-questions`).then(r => r.data),
+  resolve: (restaurantId, questionId, answer) =>
+    api.post(`/v1/restaurants/${restaurantId}/pending-questions/${questionId}/resolve`, { answer }).then(r => r.data),
+}
+
 export const upsellRules = {
   list: (restaurantId) => api.get(`/v1/restaurants/${restaurantId}/upsell-rules`).then(r => r.data),
   create: (restaurantId, data) => api.post(`/v1/restaurants/${restaurantId}/upsell-rules`, data).then(r => r.data),

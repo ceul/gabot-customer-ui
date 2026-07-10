@@ -10,8 +10,9 @@ import {
   useDraggable,
   useDroppable,
 } from '@dnd-kit/core'
-import { orders as api } from '../api'
+import { orders as api, pendingQuestions as pendingQuestionsApi } from '../api'
 import { Spinner, ErrorMsg, Button } from '../components/ui'
+import PendingQuestionCard from '../components/PendingQuestionCard'
 import socket from '../socket'
 import { useAuth } from '../context/AuthContext'
 
@@ -438,6 +439,7 @@ export default function OrdersPage() {
   const [refreshing, setRefreshing] = useState(false)
   const [activeId, setActiveId] = useState(null)
   const activeOrder = orderList.find(o => o.id === activeId) ?? null
+  const [pendingQuestions, setPendingQuestions] = useState([])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -460,6 +462,18 @@ export default function OrdersPage() {
 
   useEffect(() => { load() }, [load])
 
+  const loadPendingQuestions = useCallback(async () => {
+    if (!restaurant?.id) return
+    try {
+      const data = await pendingQuestionsApi.list(restaurant.id)
+      setPendingQuestions(Array.isArray(data) ? data : [])
+    } catch {
+      // Non-critical — the socket event will still surface new questions live.
+    }
+  }, [restaurant?.id])
+
+  useEffect(() => { loadPendingQuestions() }, [loadPendingQuestions])
+
   useEffect(() => {
     const restaurantId = restaurant?.id
     socket.connect()
@@ -473,6 +487,14 @@ export default function OrdersPage() {
       setOrderList(prev => prev.map(o => o.id === order.id ? order : o))
     })
 
+    socket.on('pending_question_created', (question) => {
+      setPendingQuestions(prev => [...prev, question])
+    })
+
+    socket.on('pending_question_resolved', ({ id }) => {
+      setPendingQuestions(prev => prev.filter(q => q.id !== id))
+    })
+
     // Re-join room after reconnect (socket.io reconnects automatically)
     socket.io.on('reconnect', () => {
       socket.emit('join_restaurant', { client_id: restaurantId })
@@ -481,10 +503,17 @@ export default function OrdersPage() {
     return () => {
       socket.off('order_created')
       socket.off('order_updated')
+      socket.off('pending_question_created')
+      socket.off('pending_question_resolved')
       socket.io.off('reconnect')
       socket.disconnect()
     }
-  }, [])
+  }, [restaurant?.id])
+
+  const handleResolvePendingQuestion = async (questionId, answer) => {
+    await pendingQuestionsApi.resolve(restaurant?.id, questionId, answer)
+    setPendingQuestions(prev => prev.filter(q => q.id !== questionId))
+  }
 
   const handleStatusChange = (updatedOrder) => {
     setOrderList(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o))
@@ -593,6 +622,15 @@ export default function OrdersPage() {
       {error && (
         <div className="mx-6 mt-4">
           <ErrorMsg message={error} />
+        </div>
+      )}
+
+      {/* ── Pending customer questions ─────────────────────────────────────── */}
+      {pendingQuestions.length > 0 && (
+        <div className="mx-6 mt-4 flex flex-col gap-2">
+          {pendingQuestions.map(q => (
+            <PendingQuestionCard key={q.id} question={q} onResolve={handleResolvePendingQuestion} />
+          ))}
         </div>
       )}
 
