@@ -115,3 +115,7 @@ export const metaCredentials = {
   get: () => api.get('/restaurant/meta-credentials').then(r => r.data),
   update: (data) => api.put('/restaurant/meta-credentials', data).then(r => r.data),
 }
+
+export const dashboard = {
+  summary: (range = 'today') => api.get('/dashboard/summary', { params: { range } }).then(r => r.data),
+}
