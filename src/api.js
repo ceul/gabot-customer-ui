@@ -33,6 +33,7 @@ api.interceptors.response.use(
 
 export const auth = {
   login: (data) => api.post('/auth/login', data).then(r => r.data),
+  googleLogin: (idToken) => api.post('/auth/google', { id_token: idToken }).then(r => r.data),
   selectRestaurant: (data) => api.post('/auth/select-restaurant', data).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
   register: (data) => api.post('/auth/register', data).then(r => r.data),

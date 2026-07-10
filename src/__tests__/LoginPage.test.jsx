@@ -16,11 +16,15 @@ vi.mock('react-router-dom', async () => {
 })
 
 vi.mock('../api', () => ({
-  auth: {
-    login: vi.fn(),
-    selectRestaurant: vi.fn(),
-    me: vi.fn(),
-  },
+  auth: { login: vi.fn(), googleLogin: vi.fn(), selectRestaurant: vi.fn(), me: vi.fn() },
+}))
+
+vi.mock('../utils/recaptcha', () => ({
+  getRecaptchaToken: vi.fn().mockResolvedValue('mock-recaptcha-token'),
+}))
+
+vi.mock('../components/GoogleSignInButton', () => ({
+  default: () => <div data-testid="google-button" />,
 }))
 
 function renderLogin() {
@@ -35,7 +39,7 @@ describe('LoginPage', () => {
   it('renders the login form with heading', () => {
     renderLogin()
     expect(screen.getByText('Panel de Control')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('admin')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('tu@correo.com')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument()
   })
@@ -46,7 +50,7 @@ describe('LoginPage', () => {
       response: { data: { error: 'Credenciales incorrectas' } }
     })
     renderLogin()
-    fireEvent.change(screen.getByPlaceholderText('admin'), { target: { value: 'bad' } })
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'bad@test.com' } })
     fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'wrong' } })
     fireEvent.click(screen.getByRole('button', { name: /entrar/i }))
     await waitFor(() => {
@@ -54,19 +58,30 @@ describe('LoginPage', () => {
     })
   })
 
+  it('sends a recaptcha token with the login request', async () => {
+    const { auth } = await import('../api')
+    auth.login.mockResolvedValueOnce({ client: { id: 1, email: 'user@test.com' }, token: 't', refresh_token: 'r', restaurant: null })
+    renderLogin()
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'user@test.com' } })
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'pass' } })
+    fireEvent.click(screen.getByRole('button', { name: /entrar/i }))
+    await waitFor(() => {
+      expect(auth.login).toHaveBeenCalledWith({ email: 'user@test.com', password: 'pass', recaptcha_token: 'mock-recaptcha-token' })
+    })
+  })
+
   it('shows restaurant selector after successful login with multiple restaurants', async () => {
     const { auth } = await import('../api')
     auth.login.mockResolvedValueOnce({
       requires_restaurant_selection: true,
-      client_id: 1,
-      username: 'testuser',
+      client: { id: 1, email: 'testuser@test.com' },
       restaurants: [
         { id: 1, name: 'Restaurante Uno' },
         { id: 2, name: 'Restaurante Dos' },
       ],
     })
     renderLogin()
-    fireEvent.change(screen.getByPlaceholderText('admin'), { target: { value: 'user' } })
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'user@test.com' } })
     fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'pass' } })
     fireEvent.click(screen.getByRole('button', { name: /entrar/i }))
     await waitFor(() => {
