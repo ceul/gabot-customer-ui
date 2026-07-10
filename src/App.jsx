@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
+import DashboardPage from './pages/DashboardPage'
 import RestaurantPage from './pages/RestaurantPage'
 import BotPage from './pages/BotPage'
 import HoursPage from './pages/HoursPage'
@@ -39,6 +40,7 @@ export default function App() {
                 <Layout>
                   <Routes>
                     <Route path="/" element={<RestaurantPage />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/bot" element={<BotPage />} />
                     <Route path="/hours" element={<HoursPage />} />
                     <Route path="/menu" element={<MenuPage />} />

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { Store, Bot, Clock, UtensilsCrossed, Star, MessageSquare, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, LogOut, CreditCard, ClipboardList } from 'lucide-react'
+import { LayoutDashboard, Store, Bot, Clock, UtensilsCrossed, Star, MessageSquare, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, LogOut, CreditCard, ClipboardList } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const mainNav = [
+  { to: '/dashboard',     label: 'Panel',           icon: LayoutDashboard },
   { to: '/orders',        label: 'Pedidos',         icon: ShoppingBag },
   { to: '/waiter',        label: 'Tomar Pedido',    icon: ClipboardList },
   { to: '/conversations', label: 'Conversaciones',  icon: MessageSquare },
