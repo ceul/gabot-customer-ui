@@ -38,6 +38,7 @@ export const auth = {
   me: () => api.get('/auth/me').then(r => r.data),
   register: (data) => api.post('/auth/register', data).then(r => r.data),
   signup: (data) => api.post('/auth/signup', data).then(r => r.data),
+  verifyEmail: (token) => api.get('/auth/verify-email', { params: { token } }).then(r => r.data),
 }
 
 export const restaurant = {
