@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { UtensilsCrossed, ChevronRight } from 'lucide-react'
 import { auth as authApi } from '../api'
@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [restaurants, setRestaurants] = useState([])
   const [selectingId, setSelectingId] = useState(null)
 
-  const handleAuthResult = (data) => {
+  const handleAuthResult = useCallback((data) => {
     if (data.requires_restaurant_selection) {
       setPendingClientId(data.client.id)
       setPendingEmail(data.client.email)
@@ -30,7 +30,7 @@ export default function LoginPage() {
       login(data.token, data.client, data.restaurant)
       navigate('/', { replace: true })
     }
-  }
+  }, [login, navigate])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -47,7 +47,7 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleCredential = async (idToken) => {
+  const handleGoogleCredential = useCallback(async (idToken) => {
     setError(null)
     setLoading(true)
     try {
@@ -58,7 +58,7 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [handleAuthResult])
 
   const handleSelectRestaurant = async (restaurantId) => {
     setError(null)

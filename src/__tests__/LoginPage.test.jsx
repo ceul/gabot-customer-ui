@@ -23,8 +23,13 @@ vi.mock('../utils/recaptcha', () => ({
   getRecaptchaToken: vi.fn().mockResolvedValue('mock-recaptcha-token'),
 }))
 
+const capturedOnCredentialRefs = []
+
 vi.mock('../components/GoogleSignInButton', () => ({
-  default: () => <div data-testid="google-button" />,
+  default: ({ onCredential }) => {
+    capturedOnCredentialRefs.push(onCredential)
+    return <div data-testid="google-button" />
+  },
 }))
 
 function renderLogin() {
@@ -34,6 +39,7 @@ function renderLogin() {
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    capturedOnCredentialRefs.length = 0
   })
 
   it('renders the login form with heading', () => {
@@ -87,5 +93,15 @@ describe('LoginPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Restaurante Uno')).toBeInTheDocument()
     })
+  })
+
+  it('passes a stable onCredential reference to GoogleSignInButton across keystrokes', () => {
+    renderLogin()
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'a' } })
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'ab' } })
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'p' } })
+    expect(capturedOnCredentialRefs.length).toBeGreaterThan(1)
+    const [first, ...rest] = capturedOnCredentialRefs
+    rest.forEach(ref => expect(ref).toBe(first))
   })
 })
