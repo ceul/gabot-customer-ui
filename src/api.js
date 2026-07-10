@@ -39,6 +39,8 @@ export const auth = {
   register: (data) => api.post('/auth/register', data).then(r => r.data),
   signup: (data) => api.post('/auth/signup', data).then(r => r.data),
   verifyEmail: (token) => api.get('/auth/verify-email', { params: { token } }).then(r => r.data),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data).then(r => r.data),
+  resetPassword: (data) => api.post('/auth/reset-password', data).then(r => r.data),
 }
 
 export const restaurant = {
