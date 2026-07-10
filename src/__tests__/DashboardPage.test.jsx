@@ -79,11 +79,30 @@ describe('DashboardPage', () => {
     })
   })
 
-  it('shows a low-confidence indicator when fulfillment sample size is small', async () => {
+  it('shows the sample size without a low-confidence suffix when n is 5 or more', async () => {
     dashboard.summary.mockResolvedValue(summaryFixture)
     render(<MemoryRouter><DashboardPage /></MemoryRouter>)
     await waitFor(() => {
-      expect(screen.getByText(/n=7/i)).toBeInTheDocument()
+      expect(screen.getByText('n=7')).toBeInTheDocument()
     })
+  })
+
+  it('shows "pocos datos" when the sample size is small but nonzero', async () => {
+    const lowSampleFixture = { ...summaryFixture, avg_rating: 5, rating_sample_size: 2 }
+    dashboard.summary.mockResolvedValue(lowSampleFixture)
+    render(<MemoryRouter><DashboardPage /></MemoryRouter>)
+    await waitFor(() => {
+      expect(screen.getByText(/n=2 · pocos datos/i)).toBeInTheDocument()
+    })
+  })
+
+  it('shows "sin datos" rather than "pocos datos" when sample size is exactly zero', async () => {
+    const zeroRatingFixture = { ...summaryFixture, avg_rating: null, rating_sample_size: 0 }
+    dashboard.summary.mockResolvedValue(zeroRatingFixture)
+    render(<MemoryRouter><DashboardPage /></MemoryRouter>)
+    await waitFor(() => {
+      expect(screen.getByText(/n=0 · sin datos/i)).toBeInTheDocument()
+    })
+    expect(screen.queryByText(/n=0 · pocos datos/i)).not.toBeInTheDocument()
   })
 })

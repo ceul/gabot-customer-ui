@@ -24,7 +24,8 @@ function formatDuration(seconds) {
 }
 
 function SecondaryTile({ icon: Icon, label, sampleSize, children }) {
-  const lowConfidence = sampleSize !== undefined && sampleSize < 5
+  const lowConfidence = sampleSize !== undefined && sampleSize > 0 && sampleSize < 5
+  const noData = sampleSize === 0
   return (
     <Card className="flex flex-col gap-1">
       <div className="flex items-center gap-2 text-secondary">
@@ -33,8 +34,8 @@ function SecondaryTile({ icon: Icon, label, sampleSize, children }) {
       </div>
       {children}
       {sampleSize !== undefined && (
-        <span className={`text-xs ${lowConfidence ? 'text-amber-600' : 'text-outline'}`}>
-          n={sampleSize}{lowConfidence ? ' · pocos datos' : ''}
+        <span className={`text-xs ${lowConfidence || noData ? 'text-amber-600' : 'text-outline'}`}>
+          n={sampleSize}{noData ? ' · sin datos' : lowConfidence ? ' · pocos datos' : ''}
         </span>
       )}
     </Card>
