@@ -37,6 +37,7 @@ export const auth = {
   selectRestaurant: (data) => api.post('/auth/select-restaurant', data).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
   register: (data) => api.post('/auth/register', data).then(r => r.data),
+  signup: (data) => api.post('/auth/signup', data).then(r => r.data),
 }
 
 export const restaurant = {
