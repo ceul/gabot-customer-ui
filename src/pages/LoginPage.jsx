@@ -5,6 +5,7 @@ import { auth as authApi } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { getRecaptchaToken } from '../utils/recaptcha'
 import GoogleSignInButton from '../components/GoogleSignInButton'
+import PasswordInput from '../components/PasswordInput'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -125,15 +126,13 @@ export default function LoginPage() {
                     <label className="text-sm font-medium text-secondary ml-0.5">Contraseña</label>
                     <Link to="/forgot-password" className="text-xs text-primary hover:underline">¿Olvidaste tu contraseña?</Link>
                   </div>
-                  <input
-                    type="password"
+                  <PasswordInput
                     autoComplete="current-password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
                     disabled={loading}
                     placeholder="••••••••"
-                    className="w-full px-3 py-2.5 text-sm border border-outline-variant rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-on-surface placeholder:text-outline disabled:opacity-50 transition-colors"
                   />
                 </div>
 

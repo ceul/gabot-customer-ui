@@ -4,6 +4,7 @@ import { UtensilsCrossed } from 'lucide-react'
 import { auth as authApi } from '../api'
 import { getRecaptchaToken } from '../utils/recaptcha'
 import GoogleSignInButton from '../components/GoogleSignInButton'
+import PasswordInput from '../components/PasswordInput'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -86,8 +87,7 @@ export default function SignupPage() {
 
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium text-secondary ml-0.5">Contraseña</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     autoComplete="new-password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -95,7 +95,6 @@ export default function SignupPage() {
                     minLength={8}
                     disabled={loading}
                     placeholder="Mínimo 8 caracteres"
-                    className="w-full px-3 py-2.5 text-sm border border-outline-variant rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-on-surface placeholder:text-outline disabled:opacity-50 transition-colors"
                   />
                 </div>
 
