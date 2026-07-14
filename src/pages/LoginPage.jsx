@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { getRecaptchaToken } from '../utils/recaptcha'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import PasswordInput from '../components/PasswordInput'
+import EmailInput from '../components/EmailInput'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -109,15 +110,13 @@ export default function LoginPage() {
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium text-secondary ml-0.5">Correo electrónico</label>
-                  <input
-                    type="email"
+                  <EmailInput
                     autoComplete="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
                     disabled={loading}
                     placeholder="tu@correo.com"
-                    className="w-full px-3 py-2.5 text-sm border border-outline-variant rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-on-surface placeholder:text-outline disabled:opacity-50 transition-colors"
                   />
                 </div>
 
