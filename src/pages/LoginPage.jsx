@@ -1,44 +1,64 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useCallback } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { UtensilsCrossed, ChevronRight } from 'lucide-react'
 import { auth as authApi } from '../api'
 import { useAuth } from '../context/AuthContext'
+import { getRecaptchaToken } from '../utils/recaptcha'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const [step, setStep] = useState('credentials')
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [pendingClientId, setPendingClientId] = useState(null)
-  const [pendingUsername, setPendingUsername] = useState('')
+  const [pendingEmail, setPendingEmail] = useState('')
   const [restaurants, setRestaurants] = useState([])
   const [selectingId, setSelectingId] = useState(null)
+
+  const handleAuthResult = useCallback((data) => {
+    if (data.requires_restaurant_selection) {
+      setPendingClientId(data.client.id)
+      setPendingEmail(data.client.email)
+      setRestaurants(data.restaurants)
+      setStep('select-restaurant')
+    } else {
+      login(data.token, data.client, data.restaurant)
+      navigate('/', { replace: true })
+    }
+  }, [login, navigate])
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
-      const data = await authApi.login({ username: username.trim(), password })
-      if (data.requires_restaurant_selection) {
-        setPendingClientId(data.client_id)
-        setPendingUsername(data.username)
-        setRestaurants(data.restaurants)
-        setStep('select-restaurant')
-      } else {
-        login(data.token, data.client, data.restaurant)
-        navigate('/', { replace: true })
-      }
+      const recaptcha_token = await getRecaptchaToken('login')
+      const data = await authApi.login({ email: email.trim(), password, recaptcha_token })
+      handleAuthResult(data)
     } catch (err) {
       setError(err.response?.data?.error || 'Credenciales incorrectas')
     } finally {
       setLoading(false)
     }
   }
+
+  const handleGoogleCredential = useCallback(async (idToken) => {
+    setError(null)
+    setLoading(true)
+    try {
+      const data = await authApi.googleLogin(idToken)
+      handleAuthResult(data)
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al iniciar sesión con Google')
+    } finally {
+      setLoading(false)
+    }
+  }, [handleAuthResult])
 
   const handleSelectRestaurant = async (restaurantId) => {
     setError(null)
@@ -87,21 +107,24 @@ export default function LoginPage() {
 
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-secondary ml-0.5">Nombre de usuario</label>
+                  <label className="text-sm font-medium text-secondary ml-0.5">Correo electrónico</label>
                   <input
-                    type="text"
-                    autoComplete="username"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    placeholder="admin"
+                    placeholder="tu@correo.com"
                     className="w-full px-3 py-2.5 text-sm border border-outline-variant rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-on-surface placeholder:text-outline disabled:opacity-50 transition-colors"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-secondary ml-0.5">Contraseña</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-secondary ml-0.5">Contraseña</label>
+                    <Link to="/forgot-password" className="text-xs text-primary hover:underline">¿Olvidaste tu contraseña?</Link>
+                  </div>
                   <input
                     type="password"
                     autoComplete="current-password"
@@ -116,7 +139,7 @@ export default function LoginPage() {
 
                 <button
                   type="submit"
-                  disabled={loading || !username.trim() || !password}
+                  disabled={loading || !email.trim() || !password}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-on-primary text-sm font-medium rounded-full hover:bg-primary-container shadow-sm active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
                 >
                   {loading ? (
@@ -124,6 +147,18 @@ export default function LoginPage() {
                   ) : 'Entrar'}
                 </button>
               </form>
+
+              <div className="flex items-center gap-2 my-4">
+                <div className="flex-1 h-px bg-outline-variant" />
+                <span className="text-xs text-outline">o</span>
+                <div className="flex-1 h-px bg-outline-variant" />
+              </div>
+
+              <GoogleSignInButton onCredential={handleGoogleCredential} />
+
+              <p className="text-center text-sm text-secondary mt-6">
+                ¿No tienes cuenta? <Link to="/signup" className="text-primary hover:underline">Regístrate</Link>
+              </p>
             </>
           )}
 
@@ -136,7 +171,7 @@ export default function LoginPage() {
                 <div>
                   <h2 className="font-space text-xl font-semibold text-on-surface">Selecciona un restaurante</h2>
                   <p className="text-sm text-secondary mt-1">
-                    Hola <span className="font-medium text-on-surface">{pendingUsername}</span>, tienes acceso a varios restaurantes.
+                    Hola <span className="font-medium text-on-surface">{pendingEmail}</span>, tienes acceso a varios restaurantes.
                   </p>
                 </div>
               </div>
