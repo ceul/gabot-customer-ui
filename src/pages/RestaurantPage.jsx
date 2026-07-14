@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
+import { Store } from 'lucide-react'
 import { restaurant as api } from '../api'
+import { useAuth } from '../context/AuthContext'
 import { PageHeader, Card, Field, Input, Toggle, SaveBar, Spinner, ErrorMsg } from '../components/ui'
 
 const DEFAULTS = {
@@ -9,6 +11,7 @@ const DEFAULTS = {
 }
 
 export default function RestaurantPage() {
+  const { restaurant } = useAuth()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [saved, setSaved] = useState(false)
@@ -17,11 +20,15 @@ export default function RestaurantPage() {
   const deliveryOn = watch('delivery_available')
 
   useEffect(() => {
+    if (!restaurant) {
+      setLoading(false)
+      return
+    }
     api.get()
       .then(data => reset({ ...DEFAULTS, ...data }))
       .catch(() => setError('No se pudo cargar la configuración del restaurante.'))
       .finally(() => setLoading(false))
-  }, [reset])
+  }, [reset, restaurant])
 
   const onSubmit = async (data) => {
     setError(null); setSaved(false)
@@ -35,6 +42,20 @@ export default function RestaurantPage() {
   }
 
   if (loading) return <Spinner />
+
+  if (!restaurant) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-24 px-4">
+        <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+          <Store size={32} className="text-primary" />
+        </div>
+        <h2 className="font-space text-xl font-semibold text-on-surface mb-2">Conecta tu restaurante</h2>
+        <p className="text-sm text-secondary max-w-sm">
+          Todavía no tienes un restaurante conectado a tu cuenta. Conecta tu número de WhatsApp Business para empezar a recibir pedidos.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div>
