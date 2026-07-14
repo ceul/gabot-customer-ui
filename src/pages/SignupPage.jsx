@@ -10,12 +10,16 @@ import EmailInput from '../components/EmailInput'
 export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [done, setDone] = useState(false)
 
+  const passwordsMismatch = confirmPassword !== '' && password !== confirmPassword
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (passwordsMismatch) return
     setError(null)
     setLoading(true)
     try {
@@ -97,9 +101,24 @@ export default function SignupPage() {
                   />
                 </div>
 
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-secondary ml-0.5">Confirmar contraseña</label>
+                  <PasswordInput
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    placeholder="Repite tu contraseña"
+                  />
+                  {passwordsMismatch && (
+                    <span className="text-xs text-error ml-0.5">Las contraseñas no coinciden</span>
+                  )}
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading || !email.trim() || password.length < 8}
+                  disabled={loading || !email.trim() || password.length < 8 || passwordsMismatch || !confirmPassword}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-on-primary text-sm font-medium rounded-full hover:bg-primary-container shadow-sm active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
                 >
                   {loading ? (

@@ -35,6 +35,7 @@ describe('SignupPage', () => {
     renderSignup()
     fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'new@test.com' } })
     fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'password123' } })
     fireEvent.click(screen.getByRole('button', { name: /crear cuenta/i }))
     await waitFor(() => {
       expect(screen.getByText(/revisa/i)).toBeInTheDocument()
@@ -48,9 +49,36 @@ describe('SignupPage', () => {
     renderSignup()
     fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'dup@test.com' } })
     fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'password123' } })
     fireEvent.click(screen.getByRole('button', { name: /crear cuenta/i }))
     await waitFor(() => {
       expect(screen.getByText('Correo ya registrado')).toBeInTheDocument()
+    })
+  })
+
+  it('disables submit when the confirmation password does not match', () => {
+    renderSignup()
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'new@test.com' } })
+    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'password456' } })
+    expect(screen.getByRole('button', { name: /crear cuenta/i })).toBeDisabled()
+  })
+
+  it('shows an error message when the confirmation password does not match', () => {
+    renderSignup()
+    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'password456' } })
+    expect(screen.getByText(/las contraseñas no coinciden/i)).toBeInTheDocument()
+  })
+
+  it('does not call signup when the confirmation password does not match', () => {
+    renderSignup()
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.com'), { target: { value: 'new@test.com' } })
+    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'password456' } })
+    fireEvent.click(screen.getByRole('button', { name: /crear cuenta/i }))
+    return import('../api').then(({ auth }) => {
+      expect(auth.signup).not.toHaveBeenCalled()
     })
   })
 })
