@@ -3,6 +3,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import RestaurantPage from '../pages/RestaurantPage'
 
+const mockUseAuth = vi.fn()
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
+}))
+
 vi.mock('../api', () => ({
   restaurant: {
     get: vi.fn().mockResolvedValue({
@@ -24,7 +29,10 @@ function renderPage() {
 }
 
 describe('RestaurantPage', () => {
-  beforeEach(() => { vi.clearAllMocks() })
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUseAuth.mockReturnValue({ restaurant: { id: 1, name: 'Test Resto' } })
+  })
 
   it('renders the page heading', async () => {
     renderPage()
@@ -48,5 +56,14 @@ describe('RestaurantPage', () => {
       expect(generalHeader).toHaveClass('text-on-surface')
       expect(deliveryHeader).toHaveClass('text-on-surface')
     })
+  })
+
+  it('shows a connect-your-restaurant empty state when the client has no restaurant', async () => {
+    mockUseAuth.mockReturnValue({ restaurant: null })
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByText('Conecta tu restaurante')).toBeInTheDocument()
+    })
+    expect(screen.queryByText('Información del Restaurante')).not.toBeInTheDocument()
   })
 })
