@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { UtensilsCrossed } from 'lucide-react'
 import { auth as authApi } from '../api'
 import { getRecaptchaToken } from '../utils/recaptcha'
+import { isPasswordValid } from '../utils/passwordRules'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import PasswordInput from '../components/PasswordInput'
+import PasswordRequirements from '../components/PasswordRequirements'
 import EmailInput from '../components/EmailInput'
 
 export default function SignupPage() {
@@ -14,12 +16,17 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [done, setDone] = useState(false)
+  const [passwordAttempted, setPasswordAttempted] = useState(false)
 
   const passwordsMismatch = confirmPassword !== '' && password !== confirmPassword
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (passwordsMismatch) return
+    if (!isPasswordValid(password)) {
+      setPasswordAttempted(true)
+      return
+    }
     setError(null)
     setLoading(true)
     try {
@@ -95,10 +102,10 @@ export default function SignupPage() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
-                    minLength={8}
                     disabled={loading}
                     placeholder="Mínimo 8 caracteres"
                   />
+                  <PasswordRequirements password={password} attempted={passwordAttempted} />
                 </div>
 
                 <div className="flex flex-col gap-1">
@@ -118,7 +125,7 @@ export default function SignupPage() {
 
                 <button
                   type="submit"
-                  disabled={loading || !email.trim() || password.length < 8 || passwordsMismatch || !confirmPassword}
+                  disabled={loading || !email.trim() || passwordsMismatch || !confirmPassword}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-on-primary text-sm font-medium rounded-full hover:bg-primary-container shadow-sm active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
                 >
                   {loading ? (
